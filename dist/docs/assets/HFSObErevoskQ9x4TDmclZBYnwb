@@ -1,0 +1,64 @@
+import jwt
+import datetime
+import secrets
+
+app_id = "1128262149073"  # 应用ID
+kid = "H_WQQlfbi0So_aJ-Esufirn0EYsy9EQuGv7o7g7ADhw"  # 公钥
+# 私钥
+private_key = """  
+-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC4HcsjNQh5h1aD
+bxq1mU4PVZJ46J96erNMeuRPLQ3oSpih1+KllN+yNFlUP86PfS7vrqNOgPxfrQC1
+M2lrkBESkfnK/s2O7LUj80cEvWKGiP7AZLo7IEzLOi3V67TCHFfKpBqclXcB8FN+
+cvvQDC0BePlXNr/i/KxbfCZZlz1RYyqXRyqxbzgpirSQOWDuAiVmOWAHGsqMmsul
+0wkNW1+db16YmbHsCekiLkkbcHKxp/0Q1LQ63hChg4CXn4lCte7uEcX8o6bYW4xf
+7UjtHuqqAXf9QRRtxrXmj3oKQxGL2RbgU8SDdEBmPfvhw16P1J2nkXwmwES5H4WD
+8wWeslLHAgMBAAECggEALixOmtw8bVnbAOg2nw88y8yuiILyJ8GowIfbRN3sLHK0
+t3XQIa1lsie9tUqxLzv6LuKxksj3Qbk9wbOMfwyos2sHZXikLXFAdi0XBOHH2Sx3
+EuHP8G8HwzmqcAkGEl4QSEICaH11VHekQMRuUT0UdleT1GLnGXI7eU/3wCUVHBkg
+EclbfpKkFXjO1QZ8SAbU/YjoGfS+edDChq9I1Ti+pkGlGtV8LBSY04GjVHsm7Ilc
+n1SxNV9siUjyFMqEc4tck3OWy6cpBTVCLX1EkbJEVcIO9Sxn9DEKPpF28t4EPulD
+ZSicZqTJQWXTqM21yBgeJowEVfyDCit8pj41jU7MeQKBgQD5M1B4yahKIQdPE7JP
+l4hQope3yyDC27MdMNpqyJ11EQAobhwGJG4U16j0so3xeiYStPVPxAzpXOdcHAZb
+Po7Y8/X+sBit7HtlvwAH30s8tSkHL3v8q/Zm8kJ5OoH5rl2YOeGwOOpRYOLtXuUq
+X79H53fJpDAHb723PMMmEciDOQKBgQC9I9yRzeM4pAawnrxFTJ1QJOHQEHmnREIq
+R43sDh+OfoE+Nhn3/AaSxNUM6fC6JvAbDerdE4CKf+x8Xe6oQ4jU10UnBI0UiC9B
+bl4n+CfGKUSu1uxFuG/gzoCVPP1U8KAOAWbdE/McycqoenN/thfmtMwfZu0Wd+RG
+A+qSIyOF/wKBgQDycJDWomHelJl2vlPYiTTuNfDit3UM/g8Y1CF6h+hgLwT3UIBl
+HWYXUuSmA1yC1HJb+r86NiLVmjPf8cfhV1BEE7x8Zrfr5Uj76MFP51ZcHmdm/TRj
+0qzq5L/1Dw3Kam/WHGHMPuL//wFnK85J1lLS0odAnkK3yWdJ8Ixu6hgoSQKBgQCu
+ii97paGvnT5HMtTOpprtYHu6A9ofz0+3sHx5f7cDSh5+iHKCc+KlAlsRJbluL4yX
+ispX5S1ToiVbx1r7kAbvUxCPpxWCAwKIwQ7Gl6wso9yr883psQAdVrM2BShKgBtT
+kVuZXFWXFWic/RMkoaeA0QslV1gmydCwA+EtppubhQKBgQDv2bD/2DZjHvme7k2l
+jcB4UeqbQbWrrQGSdHhFVMmq4t+IL4/aY0IpWARZpHONnwCJuvC0kUtDo4jL1pJb
+yD0ghT2M8sl06wOF96KVLY2D/A22Zxr4E7ZQKz3zLNuWpO1axQhMKheT84MDpYIX
+YXJkthzF+yO5Dd+qgOlxnUCbhg==
+-----END PRIVATE KEY-----
+"""
+
+def generate_jwt(user):
+
+    header = {
+        "alg": "RS256",
+        "typ": "JWT",
+        "kid": kid
+    }
+
+    now = datetime.datetime.utcnow()
+    payload = {
+        "iss": app_id,
+        "aud": "api.coze.cn",
+        "iat": now,
+        "exp": now + datetime.timedelta(minutes=15),
+        "jti": secrets.token_urlsafe(32)[:43],  
+        "session_name": user
+    }
+
+    return jwt.encode(
+        payload=payload,
+        key=private_key,
+        algorithm="RS256",
+        headers=header
+    )
+
+print(generate_jwt("1234")) # 传递用户id，实现用户会话隔离

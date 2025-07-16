@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coze智能体控制面板</title>
+    <!-- <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.1.0-beta.0/libs/cn/index.js"></script> -->
+    <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.2/libs/cn/index.js"></script>
+    <style>
+        :root {
+            --primary-color: #409eff;
+            --button-size: 120px;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .coze-btn {
+            width: var(--button-size);
+            height: var(--button-size);
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 按钮悬停动画 */
+        .coze-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        /* 响应式布局 */
+        @media (max-width: 600px) {
+            .button-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .coze-btn {
+                width: 100%;
+                height: 80px;
+            }
+        }
+
+        /* 加载动画 */
+        .loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        /* 新增聊天窗口样式 */
+        #id1 {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: auto;
+            height: 80vh;
+            max-width: 900px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            /* 初始隐藏，SDK会自动控制显示 */
+        }
+
+        @media (max-width: 600px) {
+            /* 原有移动端按钮样式保持不变... */
+
+            /* 新增移动端全屏样式 */
+            #id1 {
+                width: 100% !important;
+                height: 100% !important;
+                max-width: none;
+                border-radius: 0;
+                top: 0;
+                left: 0;
+                transform: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="button-grid">
+        <!-- 四个功能按钮 -->
+        <button class="coze-btn" data-bot="7461646208654802954">科一智考官</button>
+        <button class="coze-btn" data-bot="7449980274663981067">河北单招助手</button>
+
+    </div>
+    <div id="id1"></div>
+    <script>
+        // 生成并存储 UUID
+        // 生成并存储唯一用户标识（使用浏览器本地存储持久化）
+        let userId = localStorage.getItem('cozeUserId');
+        if (!userId) {
+            // 使用crypto API生成符合RFC4122标准的UUIDv4
+            userId = crypto.randomUUID();
+            try {
+                localStorage.setItem('cozeUserId', userId);
+            } catch (e) {
+                console.error('本地存储写入失败，可能超出存储配额:', e);
+            }
+        }
+
+        // 应用认证配置（需替换为实际生产环境参数）
+        const APP_CONFIG = {
+            app_id: '11850336',
+            kid: 'vWhGVMRG2I1KOyxItu-m3NYFFTE',
+            private_key: `-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCii6puIYlQcS28
+J4c3zVoKg/+mxaWAIE7CcnYbNuF9fTEwhOWKKcocU3FLQcbirR+nwrGu70GiJa4K
+XJmJFP/d6lQR9KwV8GXBKg4L2ragiJOUAmXhh3uLZo7NyLH84s9VvmVViNyBXJwc
+kPmE/nIyphgY3d+rRD3ul5p4Fte4iqGB6jw1oL8MsgjLNvD0LyxCgLQ6rBzF6M0+
+CC4r07fuHrjmSbtFiLoMHYzxuoD4XM0ElR+crXdGrZO8n4S/YrWV1Sp/73lqVfyR
+gQmnNznzxZyS8iUVH3BBZFpFVnUQJBM8yES2zYIvBMzv/9CDab53+2DidNE+smVg
+5UWxr57pAgMBAAECggEADY8vEW7UwJQgZ5C4k+wadcQbIHNeYfjP+SKJPa3vU4ON
+BeogJ81iochILCn5iFE+0cTJA7nLtNYF1bFx0WCiE4YHq1PIwy/BnUJ/13dQQsYB
+4Zftncmqga91fC8gweK9vv5Z/6+iDVyHXU6usexz5Eu8uN5RWT0hGXUmGpx1NFyi
+AhqrIqnFPsFo+7DK8YKqm04C95BXJwdkQxrjKL0qtLFX686cy5RKwCjaJVFwAlzN
+i8TLm/CzhwdaGIjgb3n9IIjxrjmpKTQi5h8AtCeZCd49d8uSJXR52fU30Wy/ajLy
+keIPuH/Z89hip9W0zZIWeHGKTpO9cha8lt/czXC/7QKBgQDeKh6PkekcUWSkmE4Z
+Wc3IxQmX5k9Vf++cNcZhtySec09VnWSixiAWiTxoxmboXb5q5t96AznO2E76eBLN
+vDTF8RBtaZZHzd8Ng+5BM7PClaWv29/7hpi+RQO8gBvgROkvJqYT6GGi5ePcxlqo
+5fOvlj7iPxg13ZLzRPDMZ4ljqwKBgQC7TRZl6oX1ByFjBgN07PQjGunelduw93eD
+/EMw6nvlvjzi1TVr7vH3E0OOXRNhu5fg8SliUn7H3UKXNnTJufhKpk95pjrhB37v
+slA0PP5UadF5hT7uXfAiTVZHNII7r4nl37ETm3KMFt473uSrFzcHIWtzKQCLj2D4
+kOf8e6pzuwKBgQCFekrYOXMT93b/SR6LLqBrwq5L3CzIEtCUSt7A8LcImAEPUDwZ
+a+31fEiWLrW/YCs6sTGNbgi6VM3GwIOTpkMStg4HnouS4obj6OMpu3WCMETWzsTY
+qvp0PqTLCTE2YlCzaoYXqeOXaoWnrGjl1xq84QkxB3V1T4WtsTr3pDEwdwKBgCa5
+o33i5Vtp4/9DSQetzjRL5jq9JTULlUxWpdXBRWiU0qXbizYLqz94XilbGRzF2nsJ
+oZLQl6HfH1uASNlEeA+HHzt5oQbRs+7/IRIL4lG1pzfG0uIZzgJplwMV2i9Y9dvv
+Sf9Rzncka0JZrVGqdRgmUr72pUQ1mskJvM05DF7tAoGBAITIpWtpsf55FPuSeYsK
+4zb+nSExW/918HwfX1IC1dFR874Ylu5/bISK93VVtxyNL2lWXtaQmBLEM0GM6gvW
+v7yZzYdelzj2NbMwqRsKUo5u8XBkrVvaQhn7EFqcYE/8OuqjUY893GnFcAB/6oCt
+KsMeT/jOcHksrL5XtSTpgCBX
+-----END PRIVATE KEY-----`
+        };
+
+        // 生成JWT的函数（前端实现）
+        async function generateJWT() {  // 移除 userId 参数
+            const encoder = new TextEncoder();
+            const header = {
+                alg: 'RS256',
+                typ: 'JWT',
+                kid: APP_CONFIG.kid
+            };
+
+            const now = Math.floor(Date.now() / 1000);
+            const payload = {
+                iss: APP_CONFIG.app_id,        // 颁发者（Issuer）
+                aud: 'api.coze.cn',            // 接收方（Audience）
+                iat: Math.floor(Date.now() / 1000), // 签发时间（Issued At）
+                exp: now + 900,                // 过期时间（15分钟有效期）
+                jti: self.crypto.randomUUID().substring(0, 43), // 唯一令牌标识
+                session_name: userId           // 绑定用户会话标识
+            };
+
+            // 构造签名内容
+            const encodedHeader = btoa(JSON.stringify(header))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=+$/, '');
+
+            const encodedPayload = btoa(unescape(encodeURIComponent(JSON.stringify(payload))))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=+$/, '');
+
+            // 使用Web Cryptography API签名
+            const pemContents = APP_CONFIG.private_key
+                .replace(/-----BEGIN PRIVATE KEY-----/, '')
+                .replace(/-----END PRIVATE KEY-----/, '')
+                .replace(/\s+/g, '');  // 移除所有空白字符
+
+            const binaryDer = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
+
+            const privateKey = await crypto.subtle.importKey(
+                'pkcs8',
+                binaryDer,
+                {
+                    name: 'RSASSA-PKCS1-v1_5',
+                    hash: 'SHA-256'
+                },
+                false,
+                ['sign']
+            ).catch(error => {
+                console.error('私钥导入失败，请检查PEM格式:', error);
+                throw new Error('无效的PKCS#8私钥格式');
+            });
+
+            const signature = await crypto.subtle.sign(
+                'RSASSA-PKCS1-v1_5',
+                privateKey,
+                encoder.encode(`${encodedHeader}.${encodedPayload}`)
+            );
+
+            // 构造完整JWT
+            const encodedSignature = btoa(String.fromCharCode(...new Uint8Array(signature)))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=+$/, '');
+
+            const fullJWT = `${encodedHeader}.${encodedPayload}.${encodedSignature}`;
+            // 最终JWT格式验证（符合RFC7519第7.2节规范）
+            if (!/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/.test(fullJWT)) {
+                throw new Error('JWT格式验证失败');
+            }
+            return fullJWT;
+        }
+
+        /**
+         * 获取访问令牌（实现OAuth 2.0 JWT Bearer流程）
+         * @param {string} jwtToken - 已签名的JWT凭证
+         * @returns {Promise<string|null>} access_token或null
+         */
+        async function getAccessToken(jwtToken) {
+            try {
+                // 符合RFC7523规范的JWT Bearer Token请求
+                const response = await fetch('https://api.coze.cn/api/permission/oauth2/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtToken}` // RFC6750 Bearer Token
+                    },
+                    body: JSON.stringify({
+                        grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                        duration_seconds: 3600 // 令牌有效期（秒）
+                    })
+                });
+
+                const responseText = await response.text();
+                console.log('Token响应:', responseText);
+                const data = JSON.parse(responseText);
+
+                // 新增数据有效性检查
+                if (!data?.access_token) {
+                    throw new Error('无效的access token响应');
+                }
+
+                // 本地存储访问令牌（使用localStorage实现持久化）
+                const expiresIn = 3600 * 1000; // 1小时有效期
+                localStorage.setItem('cozeAccessToken', data.access_token);
+                localStorage.setItem('cozeTokenExpiry', Date.now() + expiresIn);
+
+                return data.access_token;
+            } catch (error) {
+                console.error('令牌获取失败:', error);
+                localStorage.removeItem('cozeAccessToken'); // 清除失效凭证
+                return null;
+            }
+        }
+
+        // 初始化聊天按钮交互（事件委托模式）
+        document.querySelectorAll('.coze-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                try {
+                    // 显示加载状态指示器
+                    button.classList.add('loading');
+
+                    // 检查本地缓存令牌有效性（包含有效期验证）
+                    const cachedToken = localStorage.getItem('cozeAccessToken');
+                    const expiryTime = localStorage.getItem('cozeTokenExpiry');
+                    let accessToken = cachedToken;
+
+                    // 令牌刷新条件：缓存不存在或已过期
+                    if (!cachedToken || !expiryTime || Date.now() >= parseInt(expiryTime)) {
+                        const jwtToken = await generateJWT();
+                        accessToken = await getAccessToken(jwtToken);
+
+                        // 安全验证：确保获取到有效访问令牌
+                        if (!accessToken) {
+                            throw new Error('无法获取有效的access token');
+                        }
+                    }
+                    console.log('使用的访问令牌:', accessToken);
+                    // 初始化Coze Web SDK实例
+                    const cozeWebSDK = new CozeWebSDK.WebChatClient({
+                        config: {
+                            botId: button.dataset.bot, // 从data-bot属性获取机器人ID
+                            isIframe: false,
+                        },
+                        auth: {
+                            type: 'token',     // 使用Bearer Token认证
+                            token: accessToken,    // 注入访问令牌
+                            onRefreshToken: async () => {
+                                const jwtToken = await generateJWT();
+                                return await getAccessToken(jwtToken);
+                            },
+                        },
+                        userInfo: {
+                            id: 'user123',
+                            nickname: '访客用户'
+                        },
+                        ui: {
+                            base: {
+                                // layout: 'mobile',
+                                lang: 'zh-CN'
+                            },
+                            chatBot: {
+                                title: '智能助手',
+                                uploadable: true,
+                                el: document.getElementById('id1'),
+                                onHide: () => {
+                                    document.getElementById('id1').style.display = 'none'; // 新增显示容器
+                                },
+                                onShow: () => {
+                                    document.getElementById('id1').style.display = 'block'; // 新增显示容器
+                                },
+                            }
+                        },
+                        asstBtn: {
+                            isNeed: false,
+                        },
+                    });
+
+                    // 激活聊天窗口（遵循SDK显示规范）
+                    cozeWebSDK.showChatBot();
+                } catch (error) {
+                    console.error('初始化失败:', error);
+                    alert('服务连接失败，请稍后重试'); // 用户友好错误提示
+                } finally {
+                    button.classList.remove('loading'); // 清除加载状态
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

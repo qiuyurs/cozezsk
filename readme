@@ -1,0 +1,12 @@
+更新文档命令：npx feishu-pages
+使用程序：vitepress + feishu pages
+
+运行命令：
+npm run docs:dev
+
+首次安装 
+npm add -D vitepress
+npm install feishu-pages
+npx vitepress init 
+./dist/docs
+npx feishu-pages

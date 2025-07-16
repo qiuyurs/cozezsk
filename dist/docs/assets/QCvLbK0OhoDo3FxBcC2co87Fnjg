@@ -1,0 +1,30 @@
+import requests
+
+duration = 600  # 密钥有效期
+
+def get_access_token(jwt_token):
+    url = "https://api.coze.cn/api/permission/oauth2/token"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {jwt_token}"  # 要求的认证头格式
+    }
+    data = {
+        "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",  # 固定值
+        "duration_seconds": duration  # 可选参数
+    }
+    
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()  # 自动处理HTTP错误
+        
+        result = response.json()
+        if 'access_token' not in result:
+            raise ValueError("Invalid response format")
+            
+        return result['access_token']  # 单独提取目标字段
+        
+    except requests.exceptions.RequestException as e:
+        print(f"API请求失败: {str(e)}")
+        return None
+
+print(get_access_token("eyJhbGciOiJSUzI1NiIsImtpZCI6IkhfV1FRbGZiaTBTb19hSi1Fc3VmaXJuMEVZc3k5RVF1R3Y3bzdnN0FEaHciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiIxMTI4MjYyMTQ5MDczIiwiYXVkIjoiYXBpLmNvemUuY24iLCJpYXQiOjE3NDExNzA4NTUsImV4cCI6MTc0MTE3MTc1NSwianRpIjoibDdRZHhvcjhtMEFETGFVeENrVGVKeEFjdVBsYzFVc0I1ZmJIOEViTVdHRSIsInNlc3Npb25fbmFtZSI6IjEyMzQifQ.ni9ZGvHdrUhsEbJxIHfk0ER6ejg9lN-0q30wUtGL7ObcpZVCFAVDI_wWtFL7ZF9bSSmO1_ExDn0yR7OMNzyT32IiB-Db7HQurHSgdU0H1zQkTiPj_EcTPhO5_UWsFcBMsC8sHpx_bVCB8-OQxR5URuKbMx9VZgTzpdzBz2A06tdqmp5oEPF3DuKozzupFZn_eGNscaWc3RAJk0uiCAYd6lvcmK1jde8jfkHP309h7TZ0DHpDbMlNjVqyfbQNBdOqKzSlSY2lD1tcH2KCOCHmQM1ZaxMQNdbEtr2L3F9OFP_Nr0nnnsYNOgAOCR83yiVzKDpQuIeev7wQE5fJ5l_SQQ"))
