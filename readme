@@ -15,3 +15,6 @@ npx feishu-pages
 npm install
 npx feishu-pages
 npm run docs:build
+
+主题
+npm install vitepress-theme-teek -D
