@@ -10,3 +10,8 @@ npm install feishu-pages
 npx vitepress init 
 ./dist/docs
 npx feishu-pages
+
+编译运行
+npm install
+npx feishu-pages
+npm run docs:build

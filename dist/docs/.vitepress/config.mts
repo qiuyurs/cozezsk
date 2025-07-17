@@ -37,8 +37,9 @@ export default defineConfig({
       `MXA.init({ id: "c1-ztWxIrlt" })`
     ]
   ],
+  ignoreDeadLinks: true,
   markdown: {
-    html: false,
+    // html: false,
     attrs: {
       disable: true
     }
@@ -54,13 +55,20 @@ export default defineConfig({
         enforce: 'pre',
         transform(code, id) {
           if (id.endsWith('.md')) {
-            // 处理特殊字符，例如替换中文句号
+            // 处理特殊字符转义
             code = code.replace(/。/g, '.');
-
-            // 转义 < 和 {
-            code = code.replace(/</g, '&lt;');
+            // code = code.replace(/</g, '&lt;');
             code = code.replace(/{/g, '&#123;');
-
+            
+            // 处理图片链接，替换为占位内容
+            code = code.replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
+              // 如果是无法解析的链接，替换为占位图片
+              if (url.includes('图片链接')) {
+                return `![${alt}](https://picsum.photos/800/400?random=${Math.random()})`;
+              }
+              return match;
+            });
+            
             return code;
           }
           return null;
@@ -77,5 +85,4 @@ export default defineConfig({
 
     sidebar: convertDocsToSidebars(docs),
   },
-  ignoreDeadLinks: true,
 })
