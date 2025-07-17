@@ -47,7 +47,28 @@ const convertDocsToSidebars = (docs: any) => {
 // Teek 主题配置
 const teekConfig = defineTeekConfig({
   vitePlugins: {
+    // 关闭主题自带的侧边栏
     sidebar: false,
+  },
+  // 关闭主题首页
+  teekHome: false,
+  // 默认作者信息
+  author: {
+    name: "润雨", // 作者名称
+    link: "/HsS7wRKXci4OpBkpRuKcWKjfnif", // 点击作者名称后跳转的链接
+  },
+  // 文章分享配置
+  articleShare: {
+    enabled: true, // 是否开启文章链接分享功能
+    text: "分享此页面", // 分享按钮文本
+    copiedText: "链接已复制", // 复制成功文本
+    query: false, // 是否包含查询参数
+    hash: false, // 是否包含哈希值
+  },
+  // 最近更新栏
+  articleUpdate: {
+    enabled: false, // 是否启用文章最近更新栏
+    limit: 3, // 文章最近更新栏显示数量
   },
 });
 
