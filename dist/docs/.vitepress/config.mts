@@ -26,6 +26,9 @@ export default defineConfig({
   title: "手把手带你学扣子Coze知识库",
   titleTemplate: 'coze开发教程',
   description: "coze 扣子网站专注于 AI 开发教程，内容涵盖 coze 智能体开发、工作流搭建教程、知识库构建指南、数据库在 AI 中的应用等全面知识。提供 coze 扣子从基础到进阶的全流程 AI 开发学习资源，包括智能体构建步骤、工作流设计方法、知识库管理技巧、数据库整合实战等教程内容，助力用户掌握 coze 相关 AI 开发技能。",
+  sitemap: {
+    hostname: 'https://coze.lyzhan.cn'
+  },
   head: [
     [
       'script',
@@ -79,10 +82,19 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' }
+      { text: '首页', link: '/' },
+      { text: '知识星球', link: '/PlrTwePieibawvk2yoqccn3knFf' },
+      { text: '联系我们', link: '/HsS7wRKXci4OpBkpRuKcWKjfnif' },
     ],
-
+    footer: {
+      message: '<a href="https://beian.miit.gov.cn/">知识星球</a> or <a href="https://beian.miit.gov.cn/">联系我们</a>',
+      copyright: '<a href="https://beian.miit.gov.cn/">冀ICP备2022023787号-2</a>.'
+    },
     sidebar: convertDocsToSidebars(docs),
+    search: {
+      provider: 'local'
+    }
   },
+  lastUpdated: true,
+
 })
