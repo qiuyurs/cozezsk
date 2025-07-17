@@ -79,6 +79,7 @@ export default defineConfig({
       }
     ]
   },
+  
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
@@ -86,8 +87,9 @@ export default defineConfig({
       { text: '知识星球', link: '/PlrTwePieibawvk2yoqccn3knFf' },
       { text: '联系我们', link: '/HsS7wRKXci4OpBkpRuKcWKjfnif' },
     ],
+    
     footer: {
-      message: '<a href="https://beian.miit.gov.cn/">知识星球</a> or <a href="https://beian.miit.gov.cn/">联系我们</a>',
+      message: '<a href="/PlrTwePieibawvk2yoqccn3knFf">知识星球</a> or <a href="/HsS7wRKXci4OpBkpRuKcWKjfnif">联系我们</a>',
       copyright: '<a href="https://beian.miit.gov.cn/">冀ICP备2022023787号-2</a>.'
     },
     sidebar: convertDocsToSidebars(docs),
