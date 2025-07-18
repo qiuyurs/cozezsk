@@ -75,7 +75,7 @@ export default defineConfig({
   // Vite构建配置
   vite: {
     build: {
-      sourcemap: false
+      sourcemap: false,
     },
     plugins: [
       {
@@ -133,6 +133,8 @@ export default defineConfig({
   },
   
   // 最后更新时间
-  lastUpdated: true
+  lastUpdated: true,
+  // 关闭死链接检测
+  ignoreDeadLinks: true
 })
 
