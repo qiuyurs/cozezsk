@@ -1,6 +1,5 @@
 import { DefaultTheme, defineConfig } from 'vitepress';
 const docs = require("../../docs.json")
-import { defineTeekConfig } from "vitepress-theme-teek/config";
 /**
  * Convert feishu-pages's docs.json into VitePress's sidebar config
  * @param docs from `docs.json`
@@ -44,37 +43,12 @@ const convertDocsToSidebars = (docs: any) => {
   return sidebars;
 };
 
-// Teek 主题配置
-const teekConfig = defineTeekConfig({
-  vitePlugins: {
-    // 关闭主题自带的侧边栏
-    sidebar: false,
-  },
-  // 关闭主题首页
-  teekHome: false,
-  // 默认作者信息
-  author: {
-    name: "润雨", // 作者名称
-    link: "/HsS7wRKXci4OpBkpRuKcWKjfnif", // 点击作者名称后跳转的链接
-  },
-  // 文章分享配置
-  articleShare: {
-    enabled: true, // 是否开启文章链接分享功能
-    text: "分享此页面", // 分享按钮文本
-    copiedText: "链接已复制", // 复制成功文本
-    query: false, // 是否包含查询参数
-    hash: false, // 是否包含哈希值
-  },
-  // 最近更新栏
-  articleUpdate: {
-    enabled: false, // 是否启用文章最近更新栏
-    limit: 3, // 文章最近更新栏显示数量
-  },
-});
+
+
+
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  extends: teekConfig,
   // 站点基本配置
   title: "Coze开发指南",
   titleTemplate: 'coze开发教程',
@@ -137,7 +111,6 @@ export default defineConfig({
       { text: '知识星球', link: '/PlrTwePieibawvk2yoqccn3knFf' },
       { text: '联系我们', link: '/HsS7wRKXci4OpBkpRuKcWKjfnif' },
     ],
-    
     // 页脚配置
     footer: {
       message: '<a href="/PlrTwePieibawvk2yoqccn3knFf">知识星球</a> or <a href="/HsS7wRKXci4OpBkpRuKcWKjfnif">联系我们</a>',
