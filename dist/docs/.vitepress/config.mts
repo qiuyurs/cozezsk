@@ -62,7 +62,7 @@ export default defineConfig({
   // 头部脚本配置
   head: [
     ['script', { charts: 'UTF-8',id:'MXA_COLLECT', src: '//mxana.tacool.com/sdk.js' }],
-    ['script', {}, `MXA.init({ id: "c1-ztWxIrlt" })`]
+    ['script', {}, `MXA.init({ id: "c1-ztWxIrlt", useHeatMap: true, useHash: true, useErrorLog: true })`]
   ],
   
   // Markdown处理配置
