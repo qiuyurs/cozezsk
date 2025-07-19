@@ -103,8 +103,7 @@ export default defineConfig({
               line = line.replace(/\{\{(.*?)\}\}/g, '`{{$1}}`');
               
             // 处理特殊字符转义
-            code = code.replace(/。/g, '.');
-            
+            line = line.replace(/。/g, '.');
               
               return line;
             });
