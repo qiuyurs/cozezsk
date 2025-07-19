@@ -103,7 +103,14 @@ export default defineConfig({
               line = line.replace(/\{\{(.*?)\}\}/g, '`{{$1}}`');
               
               // 处理中文字符等特殊符号
-              line = line.replace(/[。，、；：？！]/g, match => `\\${match}`);
+              // 处理特殊字符转义
+              line = line.replace(/。/g, '\u3002');
+              line = line.replace(/，/g, '\uff0c');
+              line = line.replace(/、/g, '\u3001');
+              line = line.replace(/；/g, '\uff1b');
+              line = line.replace(/：/g, '\uff1a');
+              line = line.replace(/？/g, '\uff1f');
+              line = line.replace(/！/g, '\uff01');
               
               return line;
             });
