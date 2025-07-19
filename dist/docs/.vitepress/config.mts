@@ -102,8 +102,17 @@ export default defineConfig({
               // 处理{{}}内容，包裹为代码块
               line = line.replace(/\{\{(.*?)\}\}/g, '`{{$1}}`');
               
-            // 处理特殊字符转义
-            line = line.replace(/。/g, '.');
+              // 处理特殊字符转义
+              line = line.replace(/。/g, '.');
+              line = line.replace(/{/g, '&#123;');
+              
+              // 处理图片链接
+              line = line.replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
+                if (url.includes('图片链接')) {
+                  return `![${alt}](https://picsum.photos/800/400?random=${Math.random()})`;
+                }
+                return match;
+              });
               
               return line;
             });
