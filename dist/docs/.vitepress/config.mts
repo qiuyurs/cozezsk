@@ -102,6 +102,8 @@ export default defineConfig({
               // 处理{{}}内容，包裹为代码块
               line = line.replace(/\{\{(.*?)\}\}/g, '`{{$1}}`');
               
+              // 处理中文字符等特殊符号
+              line = line.replace(/[。，、；：？！]/g, match => `\${match}`);
               
               return line;
             });
